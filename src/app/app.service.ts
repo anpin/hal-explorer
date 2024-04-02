@@ -136,6 +136,7 @@ export class AppService {
   setCustomRequestHeaders(requestHeaders: RequestHeader[]) {
     this.customRequestHeaders = requestHeaders;
     this.setLocationHash();
+    this.requestHeadersSubject.next(this.customRequestHeaders);
   }
 
   private handleLocationHash() {

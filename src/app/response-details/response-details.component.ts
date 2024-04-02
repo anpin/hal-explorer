@@ -4,6 +4,7 @@ import {HttpErrorResponse, HttpResponse} from '@angular/common/http';
 import {JsonHighlighterService} from '../json-highlighter/json-highlighter.service';
 import {getReasonPhrase} from 'http-status-codes';
 import {NgIf, NgFor} from '@angular/common';
+import {AppService} from '../app.service';
 
 @Component({
   selector: 'app-response-details',
@@ -23,7 +24,7 @@ export class ResponseDetailsComponent implements OnInit {
 
   httpResponseReasonPhrase: string;
 
-  constructor(private requestService: RequestService, private jsonHighlighterService: JsonHighlighterService) {
+  constructor(private appService: AppService, private requestService: RequestService, private jsonHighlighterService: JsonHighlighterService) {
   }
 
   ngOnInit() {
@@ -48,6 +49,11 @@ export class ResponseDetailsComponent implements OnInit {
                 this.isString = false;
                 this.responseBody =
                   this.jsonHighlighterService.syntaxHighlight(JSON.stringify(this.httpResponse.body, undefined, 2));
+                if(this.httpResponse.url.endsWith("auth") && this.httpResponse.body.token !== undefined) {
+                  const headers = this.appService.getCustomRequestHeaders();
+                  headers.push({key: 'Authorization', value: 'Bearer ' + this.httpResponse.body.token});
+                  this.appService.setCustomRequestHeaders(headers);
+                }
               }
             }
           } else if (this.httpErrorResponse) {
